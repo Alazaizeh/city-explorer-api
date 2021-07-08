@@ -2,7 +2,6 @@ const axios = require("axios");
 const weather = (server) => {
   server.get("/weather", (req, res) => {
     let url = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${req.query.lat}&lon=${req.query.lon}&city=${req.query.city}&key=${process.env.WEATHER_API_KEY}&days=3`;
-    console.log(url);
     // `http://api.weatherbit.io/v2.0/current?key=${process.env.WEATHER_API_KEY}`;
 
     axios

@@ -1,28 +1,47 @@
 const axios = require("axios");
+const moviesDB = {};
 
 const movies = (server) => {
   server.get("/movies", (req, res) => {
     let url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${req.query.city}`;
-    axios
-      .get(url)
-      .then((moviesData) => {
-        res.status(200).send(
-          moviesData.data.results.map((movie) => {
-            return new Movies(
-              movie.title,
-              movie.overview,
-              movie.release_date,
-              movie.vote_average,
-              movie.vote_count,
-              movie.popularity,
-              movie.poster_path
-            );
-          })
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+
+    if (moviesDB[req.query.city] !== undefined) {
+      res.status(200).send(
+        moviesDB[req.query.city].map((movie) => {
+          return new Movies(
+            movie.title,
+            movie.overview,
+            movie.release_date,
+            movie.vote_average,
+            movie.vote_count,
+            movie.popularity,
+            movie.poster_path
+          );
+        })
+      );
+    } else {
+      axios
+        .get(url)
+        .then((moviesData) => {
+          moviesDB[req.query.city] = moviesData.data.results;
+          res.status(200).send(
+            moviesData.data.results.map((movie) => {
+              return new Movies(
+                movie.title,
+                movie.overview,
+                movie.release_date,
+                movie.vote_average,
+                movie.vote_count,
+                movie.popularity,
+                movie.poster_path
+              );
+            })
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   });
 };
 
